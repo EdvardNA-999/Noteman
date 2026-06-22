@@ -1,0 +1,6 @@
+{
+  "name": "Noteman",
+  "description": "Noteman is a modern, layout-rich notes application featuring English and Persian locales, Shamsi calendar formatting, markdown parsing, and a Room database engine.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
