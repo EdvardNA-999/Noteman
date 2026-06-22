@@ -49,7 +49,17 @@ object Locales {
         "medium" to "متوسط",
         "high" to "زیاد",
         "pin" to "سنجاق کردن",
-        "pin_hint" to "سنجاق به صفحه اصلی"
+        "pin_hint" to "سنجاق به صفحه اصلی",
+        "markdown_studio" to "مارک‌داون",
+        "export_md" to "خروجی فایل md.",
+        "load_note" to "بارگذاری یادداشت",
+        "select_note_to_load" to "انتخاب یادداشت برای بارگذاری",
+        "copy" to "کپی مستقیم",
+        "copied_toast" to "متن در حافظه کپی شد.",
+        "share" to "اشتراک‌گذاری",
+        "preview_tab" to "پیش‌نمایش",
+        "editor_tab" to "ویرایش متن",
+        "no_notes_to_load" to "هیچ یادداشتی برای بارگذاری وجود ندارد"
     )
 
     val en = mapOf(
@@ -95,7 +105,17 @@ object Locales {
         "medium" to "Medium",
         "high" to "High",
         "pin" to "Pin",
-        "pin_hint" to "Pin to home screen"
+        "pin_hint" to "Pin to home screen",
+        "markdown_studio" to "Markdown",
+        "export_md" to "Export .md File",
+        "load_note" to "Load Note",
+        "select_note_to_load" to "Select Note to Load",
+        "copy" to "Copy Text",
+        "copied_toast" to "Copied to clipboard.",
+        "share" to "Share",
+        "preview_tab" to "Preview",
+        "editor_tab" to "Write",
+        "no_notes_to_load" to "No notes available to load"
     )
 
     fun getString(key: String, lang: AppLanguage): String {

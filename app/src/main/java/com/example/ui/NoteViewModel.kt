@@ -63,6 +63,8 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
     private val rawNotes: StateFlow<List<Note>> = repository.allNotes
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val allNotes: StateFlow<List<Note>> = rawNotes
+
     // Filtered / Searched notes
     val filteredNotes: StateFlow<List<Note>> = combine(
         rawNotes,

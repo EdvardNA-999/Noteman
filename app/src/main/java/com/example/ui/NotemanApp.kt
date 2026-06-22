@@ -54,6 +54,10 @@ import com.example.util.Locales
 import com.example.util.MarkdownText
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
 
 @Composable
 fun NotemanApp(viewModel: NoteViewModel) {
@@ -153,6 +157,14 @@ fun AppNavigationHost(
                 language = language
             )
         }
+
+        composable("markdown") {
+            MarkdownStudioScreen(
+                navController = navController,
+                viewModel = viewModel,
+                language = language
+            )
+        }
     }
 }
 
@@ -211,6 +223,21 @@ fun NotemanBottomNavigation(
             },
             icon = { Icon(Icons.Default.Category, contentDescription = "Categories") },
             label = { Text(Locales.getString("categories", language)) }
+        )
+
+        NavigationBarItem(
+            selected = currentRoute == "markdown",
+            onClick = {
+                if (currentRoute != "markdown") {
+                    navController.navigate("markdown") {
+                        popUpTo("home") { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            },
+            icon = { Icon(Icons.Default.Code, contentDescription = "Markdown") },
+            label = { Text(Locales.getString("markdown_studio", language)) }
         )
 
         NavigationBarItem(
@@ -953,11 +980,31 @@ fun NoteDetailScreen(
     language: AppLanguage,
     noteId: Int
 ) {
+    val context = LocalContext.current
     val noteState = viewModel.getNoteById(noteId).collectAsStateWithLifecycle(initialValue = null)
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     val note = noteState.value
+
+    val saveFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/markdown")
+    ) { uri ->
+        uri?.let {
+            try {
+                context.contentResolver.openOutputStream(it)?.use { stream ->
+                    stream.write((note?.content ?: "").toByteArray(Charsets.UTF_8))
+                }
+                Toast.makeText(
+                    context,
+                    Locales.getString("save_success", language).ifEmpty { "Saved successfully!" },
+                    Toast.LENGTH_SHORT
+                ).show()
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     if (showDeleteDialog && note != null) {
         AlertDialog(
@@ -1011,6 +1058,17 @@ fun NoteDetailScreen(
                         // Edit Note Button
                         IconButton(onClick = { navController.navigate("editor/${note.id}") }) {
                             Icon(Icons.Default.Edit, contentDescription = "Edit Note")
+                        }
+
+                        // Export .md Button
+                        IconButton(onClick = {
+                            val fileName = note.title.replace(" ", "_").plus(".md")
+                            saveFileLauncher.launch(fileName)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.FileDownload,
+                                contentDescription = Locales.getString("export_md", language)
+                            )
                         }
 
                         // Delete Note Button
