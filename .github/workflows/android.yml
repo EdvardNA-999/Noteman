@@ -22,13 +22,28 @@ jobs:
         java-version: '17'
         cache: 'gradle'
 
-    - name: Fix Corrupt Gradle Wrapper (Self-healing)
+    - name: Fix Corrupt Gradle Wrapper & Fix Invalid Res Names (Self-healing)
       run: |
         echo "Checking gradle-wrapper.jar existence and state..."
         # Safely remove a potentially corrupt wrapper jar and regenerate it on-the-fly
         rm -f gradle/wrapper/gradle-wrapper.jar
         gradle wrapper --gradle-version 9.3.1
         chmod +x gradlew
+
+        echo "Cleaning up casing and hyphens in resource file names..."
+        # If GitHub repository checkout contains Vazirmatn-Regular.ttf or Vazirmatn-Bold.ttf, rename or remove them
+        if [ -d "app/src/main/res/font" ]; then
+          # Rename if they exist and lowercase doesn't exist
+          if [ -f "app/src/main/res/font/Vazirmatn-Regular.ttf" ] && [ ! -f "app/src/main/res/font/vazirmatn_regular.ttf" ]; then
+            mv "app/src/main/res/font/Vazirmatn-Regular.ttf" "app/src/main/res/font/vazirmatn_regular.ttf" || true
+          fi
+          if [ -f "app/src/main/res/font/Vazirmatn-Bold.ttf" ] && [ ! -f "app/src/main/res/font/vazirmatn_bold.ttf" ]; then
+            mv "app/src/main/res/font/Vazirmatn-Bold.ttf" "app/src/main/res/font/vazirmatn_bold.ttf" || true
+          fi
+          # Force clean any uppercase leftovers to avoid duplicate name failures on case-insensitive vs case-sensitive filesystems
+          rm -f "app/src/main/res/font/Vazirmatn-Regular.ttf" || true
+          rm -f "app/src/main/res/font/Vazirmatn-Bold.ttf" || true
+        fi
 
     - name: Build with Gradle
       run: ./gradlew assembleDebug
